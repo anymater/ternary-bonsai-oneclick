@@ -1,0 +1,47 @@
+THIRD-PARTY NOTICES
+===================
+
+本仓库（ternary-bonsai-oneclick）只包含安装脚本与启动脚本，许可为 MIT（见 LICENSE）。
+它**不包含、也不再分发**任何模型权重或推理引擎二进制文件。
+
+安装过程中会从以下官方公开发布源下载内容。使用者需自行遵守各自的许可条款。
+
+
+1) 模型权重：Ternary Bonsai 2 27B
+   ------------------------------------------------------------------
+   发布方  : PrismML (Prism ML, Inc.)
+   来源    : https://huggingface.co/prism-ml/Ternary-Bonsai-2-27B-gguf
+             https://modelscope.cn/models/prism-ml/Ternary-Bonsai-2-27B-gguf
+   许可    : Apache License 2.0
+   基座    : Qwen3.8-27B，同样为 Apache License 2.0
+   说明    : Apache-2.0 允许商用与再分发，但要求保留版权与许可声明。
+             本仓库未再分发权重，因此该义务由使用者从上述官方源获取时一并承担。
+
+
+2) 推理引擎：llama.cpp（PrismML fork）
+   ------------------------------------------------------------------
+   发布方  : PrismML-Eng
+   来源    : https://github.com/PrismML-Eng/llama.cpp
+   许可    : MIT License
+   Copyright (c) 2023-2026 The ggml authors
+   上游    : https://github.com/ggml-org/llama.cpp
+   说明    : 二进制从其 GitHub Release（tag prism-b12128-d7b2896）下载，
+             安装器用 SHA256 固定版本，见 manifest.json。
+
+
+3) CUDA 运行时（cudart 包）
+   ------------------------------------------------------------------
+   发布方  : 由 PrismML 的 llama.cpp Release 附带发布
+   来源    : 同上 Release 中的 cudart-llama-bin-win-cuda-*.zip
+   内容    : NVIDIA CUDA Toolkit 的可再分发运行库（cudart / cublas / cublasLt）
+   说明    : 这些 DLL 受 NVIDIA CUDA Toolkit EULA 及其可再分发清单约束。
+             本仓库不再分发，由安装器下载并解压到 runtime\bin\ 供应用本地加载。
+             使用者需遵守 NVIDIA 的许可条款。
+
+
+4) 其他
+   ------------------------------------------------------------------
+   - 脚本使用 Windows 自带的 curl.exe（Windows 10 1803+）与 PowerShell 5.1，
+     不额外引入第三方运行时。
+   - 若你 fork 本仓库并自行打包分发权重或二进制，请自行补充上述各方的
+     LICENSE / NOTICE 文件，并确认符合其条款。

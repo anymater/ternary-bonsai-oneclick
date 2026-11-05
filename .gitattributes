@@ -1,0 +1,16 @@
+# 换行约定 —— 这条很关键，不要删
+#
+# launcher 下的 .bat 必须是 CRLF，否则 cmd 解析会出错；.ps1 同理。
+# 统一用 eol=crlf 让 git 在 checkout 时强制换成 CRLF（仓库里存 LF，diff 可读）。
+# 不能只靠 core.autocrlf，因为它在别人机器上可能是 false。
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
+
+# 其余文本文件统一 LF
+*       text=auto eol=lf
+
+# 这些是运行时产物，不该进仓库（与 .gitignore 呼应）
+*.gguf  binary
+*.zip   binary
+*.dll   binary
+*.exe   binary

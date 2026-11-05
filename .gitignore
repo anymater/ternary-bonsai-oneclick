@@ -1,0 +1,16 @@
+# 运行时产物，由 install.bat 生成
+runtime/
+models/
+_cache/
+logs/
+config/keys.txt
+config/env.txt
+config/model.txt
+config/ctx.txt
+config/ngl.txt
+
+# 测试与临时
+*.log
+_*.log
+__pycache__/
+*.tmp
