@@ -1,15 +1,17 @@
-# 换行约定 —— 这条很关键，不要删
+# 换行约定 —— 这段顺序不能乱，也不要删
 #
-# launcher 下的 .bat 必须是 CRLF，否则 cmd 解析会出错；.ps1 同理。
-# 统一用 eol=crlf 让 git 在 checkout 时强制换成 CRLF（仓库里存 LF，diff 可读）。
-# 不能只靠 core.autocrlf，因为它在别人机器上可能是 false。
+# 规则是「后面的覆盖前面的」，所以泛化的 * 必须写在最前面，特例写在后面。
+# 第一版把 * 写在最后，结果 *.bat 的 eol=crlf 被覆盖，clone 下来全是 LF，
+# Windows 上 cmd 解析 .bat 会出错 —— 已修正并实测验证过。
+
+# 1) 默认：文本文件统一 LF（仓库内规范化）
+*       text=auto eol=lf
+
+# 2) 特例：这两个必须是 CRLF，否则 cmd / PowerShell 解析会出问题
 *.bat   text eol=crlf
 *.ps1   text eol=crlf
 
-# 其余文本文件统一 LF
-*       text=auto eol=lf
-
-# 这些是运行时产物，不该进仓库（与 .gitignore 呼应）
+# 3) 这些是二进制，不做任何换行处理
 *.gguf  binary
 *.zip   binary
 *.dll   binary
