@@ -9,7 +9,7 @@
   4. 可重复执行：已下载且校验通过的文件会跳过。
 
   用法：
-    tools\install.ps1 [-SkipModel] [-Vision] [-Packing PTQ1_0|PQ2_0|Q2_0] [-Ctx 131072] [-Parts 8]
+    tools\install.ps1 [-SkipModel] [-Vision] [-Packing PTQ1_0|PQ2_0|Q2_0] [-Ctx 131072] [-Parts 12]
 #>
 param(
     [switch]$SkipModel,
