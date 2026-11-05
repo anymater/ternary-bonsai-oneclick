@@ -124,7 +124,12 @@ if ($Parts -le 0) {
 }
 if ($Parts -gt $WORKERS_MAX) { $Parts = $WORKERS_MAX }
 
-if ($ChunkMB -gt 0) {
+# -Parts 1 的语义是"别分块，单个请求下整个文件"：
+# 切成多块再串行下没有收益，反而每块都要重新握手，还可能被服务端按请求数限速
+if ($Parts -le 1) {
+    $chunkSize = $Size
+    $ChunkMB = 0
+} elseif ($ChunkMB -gt 0) {
     $chunkSize = [long]$ChunkMB * 1MB
 } else {
     # 目标是总块数约为 工人数 x 8：够细，工人不会干等；又不至于块太碎
@@ -373,14 +378,19 @@ if ($bad.Count -gt 0) {
 }
 
 # ---------------------------------------------------------------- 7. 合并
-Write-Host "  [合并] 拼接分块 ..."
-$fs = [System.IO.File]::Create($Out)
-try {
-    for ($i = 0; $i -lt $nChunks; $i++) {
-        $in = [System.IO.File]::OpenRead((Get-ChunkPath $i))
-        try { $in.CopyTo($fs, 1MB) } finally { $in.Close() }
-    }
-} finally { $fs.Close() }
+if ($nChunks -eq 1) {
+    # 单块就是整个文件，改名即可，别白拷一遍（6 GB 模型拷一次要多花几十秒和 6 GB 磁盘）
+    Move-Item -LiteralPath (Get-ChunkPath 0) -Destination $Out -Force
+} else {
+    Write-Host "  [合并] 拼接分块 ..."
+    $fs = [System.IO.File]::Create($Out)
+    try {
+        for ($i = 0; $i -lt $nChunks; $i++) {
+            $in = [System.IO.File]::OpenRead((Get-ChunkPath $i))
+            try { $in.CopyTo($fs, 1MB) } finally { $in.Close() }
+        }
+    } finally { $fs.Close() }
+}
 
 $final = (Get-Item $Out).Length
 if ($final -ne $Size) {
