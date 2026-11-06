@@ -155,7 +155,7 @@ built with MSVC 19.44.35229.0 for Windows AMD64
 - 净化 PATH（无 CUDA Toolkit）下引擎可运行
 - `start.bat` 正确读取 `config\ctx.txt`：`n_ctx = 131072`
 - 鉴权：`/health` `/` 免鉴权 200；`/props` `/v1/models` `/v1/chat/completions` 无密钥 401、有密钥 200、错密钥 401
-- 局域网：`192.168.1.100:8080` 端到端推理通
+- 局域网：`192.168.x.x:8080` 端到端推理通
 - `stop.bat` 按路径精确筛选，只杀本项目进程
 
 **未验证**

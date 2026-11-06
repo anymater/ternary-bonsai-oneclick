@@ -132,7 +132,7 @@ providers:
 ## 手机 / 局域网访问
 
 1. 跑一次 `launcher\allow-lan-firewall.bat`，UAC 点"是"。
-2. `start.bat` 会打印形如 `http://192.168.1.100:8080/` 的地址。
+2. `start.bat` 会打印形如 `http://192.168.1.100:8080/` 的地址（你的实际地址取决于路由器分配）。
 3. 手机连同一个 Wi-Fi 打开，Web UI 设置里填 `config\keys.txt` 的内容（填一次浏览器会记住）。
 
 跨公网访问（类似 LM Studio 的 LM Link 远端层）不在本项目范围内：`cloudflared` 的 QUIC 与 HTTP/2 在受限网络下都连不通，Tailscale 的 DERP 也常不可达。要做的话建议自备 Tailscale 账号或用自签证书 + 可信内网。
