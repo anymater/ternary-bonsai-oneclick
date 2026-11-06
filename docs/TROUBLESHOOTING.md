@@ -105,6 +105,23 @@ install.bat --parts 16
 
 不会。它按**进程可执行文件的完整路径**是否位于本项目目录下来筛选，LM Studio 自带的是另一个路径，不会被误杀。这也是不用 `taskkill /IM llama-server.exe` 的原因。
 
+### 服务跑着跑着自己没了，日志停在 `listening on` 之后再无内容
+
+**没有任何报错、没有崩溃记录、日志正好断在 `listening on http://0.0.0.0:8080`** —— 这说明进程是被外部终止的，不是自己退出的。
+
+最常见的原因：**把 `llama-server.exe` 当成了某个终端/脚本的子进程直接启动**（例如在别的程序里 `./llama-server ... &`、在 CI/代理里 `subprocess.run` 起一个、在远程会话里挂后台）。父进程或那个会话结束时，子进程会被连带回收，而它自己没有机会写任何日志。
+
+正确做法：双击 `start.bat`。它内部用 `start "Bonsai2-128K" /min ...` 把服务放进**独立控制台**，不再挂在你当前终端上，终端关掉服务继续跑。
+
+排查这类问题看两处就够：
+
+```bat
+curl -sf --noproxy "*" http://127.0.0.1:8080/health   :: 通了就是活着
+launcher\status.bat                                    :: 进程数、PID、显存、上下文一屏
+```
+
+如果 `status.bat` 里进程数 = 0 而日志停在 `listening on`，就是被外部终止了，直接 `start.bat` 重开即可。
+
 ### Web UI 显示 `Access denied` / `Server Connection Error`
 
 服务启用了 API 密钥鉴权。在 Web UI 的设置里填 `config\keys.txt` 那一行（填一次浏览器会记住，存在 `localStorage`）。
