@@ -11,7 +11,7 @@
 系统缺 Universal C Runtime 的 API-set 转发件。装一次微软官方运行库即可：
 
 - 搜 "Visual C++ 2015-2022 Redistributable x64"（`vc_redist.x64.exe`），装完重启终端。
-- 注意：`C:\Windows\System32\ucrtbase.dll` 存在**不代表**没问题。精简版 Windows 镜像常缺 `api-ms-win-crt-*` 这一组转发 DLL，`llama-server` 是 MSVC 构建，导入表里点名要它们。
+- 注意：`C:\Windows\System32\ucrtbase.dll` 存在**不代表**没问题。部分 Windows 镜像会缺 `api-ms-win-crt-*` 这一组转发 DLL，`llama-server` 是 MSVC 构建，导入表里点名要它们。
 
 ### `cudart64_12.dll` / `cublas64_12.dll` / `cudart64_13.dll` 找不到
 
@@ -140,24 +140,11 @@ curl -H "Authorization: Bearer <你的密钥>" http://127.0.0.1:8080/v1/models
 
 ---
 
-## 接入 DSH 相关
+## 客户端报超长 prompt / 上下文压缩失败
 
-### `Cannot switch to ...: context compaction failed: ... reserves 0 completion tokens and 65536 headroom tokens of its 65536-token context window, leaving no pressure budget`
+客户端里的上下文窗口必须和服务端 `-c`（`config\ctx.txt`）一致。改了一边忘了另一边就会这样。
 
-`compaction-basic` 的 `headroomTokens` 默认就是 **65536**。如果你的 `contextWindow` 也写 65536，则：
-
-```
-pressureBudget = (65536 - 0) - 65536 = 0   ->  抛 TargetPressureConfigError
-```
-
-两条修法，选一：
-
-1. **把窗口开大**（本项目默认路线）：服务端 `-c 131072` + DSH `contextWindow: 131072`，此时 `pressureBudget = 131072 - 65536 = 65536 > 0`，算术上必然成立。
-2. **把 headroom 降下来**：在 DSH 的 patch 里加 `headroomTokens: 8192`（可配 `modelPolicies` 只对本模型生效）。
-
-### DSH 发超长 prompt 报错
-
-DSH 的 `contextWindow` 是写死在 provider 里的，必须和服务端 `-c`（也就是 `config\ctx.txt`）一致。改了一边忘了另一边就会这样。
+如果客户端自己也做上下文压缩，窗口给小了（比如 65536）还可能算不出压缩余量、直接拒绝切换模型。把窗口开到 131072，或调低客户端的压缩预留（headroom）参数。
 
 ---
 

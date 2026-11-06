@@ -7,7 +7,7 @@
 | GPU | NVIDIA GeForce RTX 4070 Ti，12282 MiB |
 | 驱动 | 617.42 |
 | CPU 架构 | x64（AMD64） |
-| 系统 | 精简版 Windows（缺 `api-ms-win-crt-*` 转发件，见 TROUBLESHOOTING） |
+| 系统 | Windows x64 |
 | 引擎 A（官方） | `PrismML-Eng/llama.cpp` `prism-b12128-d7b2896`，MSVC 19.44 |
 | 引擎 B（自编译） | 同 fork `0.7.0-dev (build 1, commit 62c418c)`，MSVC 14.44 / CUDA 13.3，`CMAKE_CUDA_ARCHITECTURES=89` |
 | 模型 | `Ternary-Bonsai-2-27B-PTQ1_0.gguf`，5946648928 B，SHA256 `53107f53…f33ee3` |

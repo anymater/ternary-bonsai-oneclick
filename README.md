@@ -23,7 +23,7 @@
 所以本仓库**不包含任何权重和二进制**，只包含：
 
 1. **安装器**：检测硬件 → 选对版本 → 双源分块队列下载 → SHA256 校验 → 解压 → 写配置
-2. **启动器层**（这才是本项目真正的价值）：中文 Windows 双击即用、API 密钥、局域网共享、状态诊断、DSH/OpenAI 客户端接入
+2. **启动器层**（这才是本项目真正的价值）：中文 Windows 双击即用、API 密钥、局域网共享、状态诊断、任意 OpenAI 兼容客户端接入
 
 官方已经有 [`Bonsai-demo`](https://github.com/PrismML-Eng/Bonsai-demo)（`setup.sh` 自动拉取权重和二进制）。本项目不重复造它，补的是它在 Windows 上缺的那一层：
 
@@ -99,33 +99,17 @@ CUDA 运行时是通过官方 Release 附带的 `cudart` 包解压到 `runtime\b
 
 ---
 
-## 接入 DSH / 任何 OpenAI 兼容客户端
+## 接入任意 OpenAI 兼容客户端
 
-服务是标准 OpenAI 接口，`baseURL` 填 `http://127.0.0.1:8080/v1`，模型名 `ternary-bonsai-2-27b`（= 启动参数 `-a`），密钥是 `config\keys.txt` 里那一行。
+服务是标准 OpenAI 接口：
 
-DSH（DeepSeek Harness）的配置写法，在 `~/.dsh/profiles/desktop/cordis.patch.yml`：
+- `baseURL`：`http://127.0.0.1:8080/v1`
+- 模型名：`ternary-bonsai-2-27b`（= 启动参数 `-a`）
+- 密钥：`config\keys.txt` 里那一行
 
-```yaml
-providers:
-  bonsai-local:
-    displayName: bonsai-local
-    api: openai-completions
-    baseURL: http://127.0.0.1:8080/v1
-    apiKeyEnv: BONSAI_API_KEY
-    models:
-      - id: ternary-bonsai-2-27b
-        name: Ternary-Bonsai-2-27B
-        contextWindow: 131072      # 必须与服务端 -c 一致
-        input: [text]
-```
+客户端里的上下文窗口要设成和服务端 `-c` 一致（默认 `131072`，见 `config\ctx.txt`）。不一致会报超长 prompt 错误；如果客户端自己也做上下文压缩，窗口给小了还可能直接拒绝切换模型。
 
-密钥放在 `~/.dsh/.credentials.yaml` 的 `refs` 下，`BONSAI_API_KEY: <config\keys.txt 内容>`。
-
-> **两个必看的前提**
-> 1. `contextWindow` 必须等于服务端 `-c`。不一致会发超长 prompt 报错。
-> 2. 如果 `contextWindow` 是 65536，且 `compaction-basic` 的 `headroomTokens` 也是默认 65536，则 `pressureBudget = 65536 - 0 - 65536 = 0`，切换模型会报 `context compaction failed`。要么把窗口开到 128K，要么把 `headroomTokens` 降下来（本机采用前者 + `headroomTokens: 8192` 补丁）。
-
-鉴权范围（实测）：`/health` 与 `/` 静态页面免鉴权（方便启动器轮询和探活）；`/props`、`/v1/models`、`/v1/chat/completions` 无密钥一律 **401**。**本机也没有豁免**。
+鉴权范围（实测）：`/health` 与 `/` 静态页面免鉴权（方便启动器轮询和探活）；`/props`、`/v1/models`、`/v1/chat/completions` 无密钥一律 **401**。
 
 ---
 
